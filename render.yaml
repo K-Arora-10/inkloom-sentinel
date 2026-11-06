@@ -23,11 +23,10 @@ services:
           name: inkloom-postgres
           property: connectionString
 
-  # Frontend React Static Site
+    # Frontend React Static Site
   - type: web
-    name: inkloom-sentinel-ui
     runtime: static
-    region: oregon
+    name: inkloom-sentinel-ui
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     routes:
