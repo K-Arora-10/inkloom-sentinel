@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: inkloom-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: inkloom
+      POSTGRES_PASSWORD: inkloom_password
+      POSTGRES_DB: inkloom_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: inkloom-backend
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://inkloom:inkloom_password@postgres:5432/inkloom_db
+      FRONTEND_URL: http://localhost:5173
+      ENVIRONMENT: production
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
