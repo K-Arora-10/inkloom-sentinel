@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.config import settings
 from backend.app.database import engine, Base, SessionLocal
@@ -55,6 +55,11 @@ app.include_router(releases.router, prefix=settings.API_PREFIX)
 app.include_router(history.router, prefix=settings.API_PREFIX)
 app.include_router(analytics.router, prefix=settings.API_PREFIX)
 app.include_router(demo.router, prefix=settings.API_PREFIX)
+
+@app.head("/api/health", include_in_schema=False)
+@app.head("/health", include_in_schema=False)
+async def health_check_head():
+    return Response(status_code=200)
 
 @app.get("/")
 def root():

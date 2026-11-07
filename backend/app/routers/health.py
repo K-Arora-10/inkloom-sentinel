@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from backend.app.database import get_db
@@ -6,6 +6,10 @@ from backend.app.config import settings
 from backend.app.services.crypto_service import get_or_create_ed25519_keypair
 
 router = APIRouter(prefix="/health", tags=["Health"])
+
+@router.head("", include_in_schema=False)
+async def health_check_head():
+    return Response(status_code=200)
 
 @router.get("")
 def health_check(db: Session = Depends(get_db)):
