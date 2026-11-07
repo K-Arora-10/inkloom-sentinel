@@ -20,12 +20,9 @@ services:
           name: inkloom-postgres
           property: connectionString
 
-  # Frontend Vite React Static Site
-  - type: web
+  # Frontend Vite React Static Site (Global CDN)
+  - type: static
     name: inkloom-sentinel-ui
-    env: static
-    region: oregon
-    plan: free
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     routes:

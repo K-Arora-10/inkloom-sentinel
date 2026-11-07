@@ -1,5 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL 
-  ? `${import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '')}/api`
+const rawBase = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = rawBase
+  ? `${(rawBase.startsWith('http://') || rawBase.startsWith('https://') ? rawBase : `https://${rawBase}`).replace(/\/$/, '')}/api`
   : '/api';
 
 export async function fetchApi(endpoint, options = {}) {
