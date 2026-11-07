@@ -29,7 +29,7 @@ class BaseAIProvider:
         raise NotImplementedError
 
 class GeminiAIProvider(BaseAIProvider):
-    def __init__(self, api_key: str, model: str = "gemini-1.5-flash"):
+    def __init__(self, api_key: str, model: str = "gemini-3.8-flash"):
         self.api_key = api_key
         self.model = model
         self.endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent?key={self.api_key}"

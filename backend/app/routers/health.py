@@ -33,6 +33,6 @@ def health_check(db: Session = Depends(get_db)):
         "organization": "NexaPay Technologies India",
         "database_connected": db_ok,
         "crypto_engine_ready": crypto_ok,
-        "ai_provider": "Gemini 1.5 Flash (Cloud)" if settings.GEMINI_API_KEY else "Local Deterministic & Contextual Engine (Active)",
+        "ai_provider": f"Gemini 3.8 Flash (Cloud - {settings.GEMINI_MODEL})" if settings.GEMINI_API_KEY else "Local Deterministic & Contextual Engine (Active)",
         "environment": "Production Ready"
     }

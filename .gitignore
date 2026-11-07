@@ -8,10 +8,14 @@ env/
 venv/
 .venv/
 data/*.db
+backend/data/*.db
 data/*.pem
+backend/data/*.pem
 data/uploads/*
 !data/uploads/.gitkeep
 .pytest_cache/
+scratch/
+inspect_deployed.py
 
 # Node & Frontend
 node_modules/

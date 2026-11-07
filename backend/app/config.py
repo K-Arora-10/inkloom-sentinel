@@ -30,7 +30,7 @@ class Settings(BaseModel):
     
     # Gemini AI
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
     
     # Cryptographic keys
     ED25519_PRIVATE_KEY_HEX: str = os.getenv("ED25519_PRIVATE_KEY", "")

@@ -1,7 +1,23 @@
+// Determine backend API Base URL with smart production fallback
 const rawBase = import.meta.env.VITE_API_BASE_URL;
-const API_BASE = rawBase
-  ? `${(rawBase.startsWith('http://') || rawBase.startsWith('https://') ? rawBase : `https://${rawBase}`).replace(/\/$/, '')}/api`
-  : '/api';
+
+function resolveApiBase() {
+  if (rawBase && rawBase.trim()) {
+    const formatted = rawBase.startsWith('http://') || rawBase.startsWith('https://')
+      ? rawBase
+      : `https://${rawBase}`;
+    return `${formatted.replace(/\/$/, '')}/api`;
+  }
+
+  // If in browser and deployed on Render (or any non-localhost host), point directly to the live backend
+  if (typeof window !== 'undefined' && window.location && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return 'https://inkloom-sentinel-api-d40s.onrender.com/api';
+  }
+
+  return '/api';
+}
+
+const API_BASE = resolveApiBase();
 
 export async function fetchApi(endpoint, options = {}) {
   const currentRole = localStorage.getItem('inkloom_user_role') || 'CREATOR';
@@ -14,28 +30,54 @@ export async function fetchApi(endpoint, options = {}) {
     ...(options.headers || {})
   };
 
-  // If body is FormData, delete Content-Type to allow browser boundary calculation
   if (options.body instanceof FormData) {
     delete headers['Content-Type'];
   }
 
-  const res = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers
-  });
+  let res;
+  try {
+    res = await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
+      headers
+    });
+  } catch (netErr) {
+    throw new Error(
+      `Unable to reach the server (${netErr.message}). The backend web service on Render may be waking up from cold start. Please wait 15-20 seconds and try again.`
+    );
+  }
+
+  const rawText = await res.text();
+  let data = null;
+  if (rawText && rawText.trim()) {
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      data = null;
+    }
+  }
+
+  // If the server returned HTML instead of JSON (typical when a static CDN rewrites /api to index.html)
+  if (rawText && (rawText.includes('<!doctype html>') || rawText.includes('<html'))) {
+    throw new Error(
+      `Received HTML instead of API response from ${API_BASE}. Please ensure backend API URL is configured correctly.`
+    );
+  }
 
   if (!res.ok) {
-    let errorDetail = 'API Request Failed';
-    try {
-      const errJson = await res.json();
-      errorDetail = errJson.detail || errJson.message || errorDetail;
-    } catch {
-      errorDetail = `HTTP ${res.status}: ${res.statusText}`;
-    }
+    const errorDetail =
+      (data && (data.detail || data.message)) ||
+      (rawText && rawText.length < 200 ? rawText : `Server returned HTTP ${res.status}: ${res.statusText}`);
     throw new Error(errorDetail);
   }
 
-  return res.json();
+  if (data === null) {
+    if (res.status === 204 || (!rawText && res.ok)) {
+      return {};
+    }
+    throw new Error(`Server returned unexpected format (${res.status}): ${rawText.slice(0, 100)}`);
+  }
+
+  return data;
 }
 
 // Health & Demo

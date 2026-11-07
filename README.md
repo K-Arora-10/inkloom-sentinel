@@ -96,7 +96,7 @@ Frontend starts on `http://localhost:5173`.
 ```ini
 DATABASE_URL=sqlite:///data/inkloom.db
 GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=gemini-1.5-flash
+GEMINI_MODEL=gemini-3.8-flash
 ED25519_PRIVATE_KEY=
 FRONTEND_URL=http://localhost:5173
 ENVIRONMENT=production
